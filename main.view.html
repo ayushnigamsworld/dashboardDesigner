@@ -1,0 +1,41 @@
+<div class="demo-container">
+    <h2>Standard Items</h2>
+    <input type="button" ng-click="gridsterOpts.draggable.enabled = !gridsterOpts.draggable.enabled" value="{{gridsterOpts.draggable.enabled ? 'Disable' : 'Enable' }} Draggability" />
+    <input type="button" ng-click="gridsterOpts.resizable.enabled = !gridsterOpts.resizable.enabled" value="{{gridsterOpts.resizable.enabled ? 'Disable' : 'Enable' }} Resizability" />
+	<input type="button" ng-click="gridsterOpts.floating = !gridsterOpts.floating" value="{{gridsterOpts.floating ? 'Disable' : 'Enable' }} Floating" />
+	<input type="button" ng-click="gridsterOpts.pushing = !gridsterOpts.pushing" value="{{gridsterOpts.pushing ? 'Disable' : 'Enable' }} Pushing" />
+	<input type="button" ng-click="gridsterOpts.swapping = !gridsterOpts.swapping" value="{{gridsterOpts.swapping ? 'Disable' : 'Enable' }} Swapping" />
+
+	Margins:
+	<input type="text" ng-model="gridsterOpts.margins[0]" size="3" />
+	x
+	<input type="text" ng-model="gridsterOpts.margins[1]" size="3" />
+
+    <h2>Custom Items</h2>
+    <p>
+        Each item provides its own dimensions but with custom fields defined using customItemMap: { position: [row, col], size: { x: sizeX, y: sizeY }}
+    </p>
+    <div gridster="gridsterOpts">
+        <ul>
+            <li gridster-item="customItemMap" ng-repeat="item in customItems">
+                <input type="text" integer ng-model="item.position[0]" size="1" />,
+                <input type="text" integer ng-model="item.position[1]" size="1" />
+                <br />
+                <input type="text" integer ng-model="item.size.x" size="1" />x
+                <input type="text" integer ng-model="item.size.y" size="1" />
+            </li>
+        </ul>
+    </div>
+
+
+    <div gridster>
+        <ul>
+			<li gridster-item></li>
+			<li gridster-item></li>
+			<li gridster-item></li>
+        </ul>
+    </div>
+
+    <script src="dataService.js"></script>
+
+</div>
