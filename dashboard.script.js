@@ -107,6 +107,7 @@ angular.module('app')
 						options = DataService[chart].options();
 						let colArr = new Array();
 						let valArr = new Array();
+					    $scope.widgetData.push(widgetName);
 						if(response.data.data[i].table_name != ""){
 						    let newData = {};
 						    newData["tableName"] = response.data.data[i].table_name;
@@ -143,7 +144,7 @@ angular.module('app')
                                   url: response.data.data[i].api
                                 }).then(function successCallback(response) {
                                     console.log(response);
-					                $scope.widgetData.push(chart);
+
                                     for(var name in response.data.data){
                                         if(options.series[0].type == 'line'){
                                             colArr.push(response.data.data[name].agentName);
