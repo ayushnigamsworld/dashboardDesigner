@@ -102,7 +102,7 @@ angular.module('app')
 					let options;
 					let widgetName = response.data.data[i].name;
 					let chart = response.data.data[i].chart;
-					$scope.widgetData.push(chart);
+
 					$scope.widgetJsonData.push(response.data.data[i]);
 						options = DataService[chart].options();
 						let colArr = new Array();
@@ -129,7 +129,7 @@ angular.module('app')
                                   url: response.data.data[i].api
                                 }).then(function successCallback(response) {
                                     console.log(response);
-
+					                $scope.widgetData.push(chart);
                                     for(var name in response.data.data){
                                         if(options.series[0].type == 'line'){
                                             colArr.push(response.data.data[name].agentName);
@@ -188,39 +188,49 @@ angular.module('app')
             				console.log(response);
             				for(var i=0; i<response.data.data.length; i++){
             					var options;
-            					var widgetName = response.data.data[i].name;
+            					var widgetNameTest = response.data.data[i].name;
             					var chart = response.data.data[i].chart;
             						var options = DataService[chart].options();
             						var colArr = new Array();
             						var valArr = new Array();
-            						$http({
-            						  method: 'GET',
-            						  url: response.data.data[i].api
-            						}).then(function successCallback(response) {
-            							console.log(response);
+            						if(widgetName == chart){
+            						    $http({
+                                      method: 'GET',
+                                      url: response.data.data[i].api
+                                    }).then(function successCallback(response) {
+                                        console.log(response);
 
-            							for(var name in response.data.data){
-            								colArr.push(name);
-            								valArr.push(response.data.data[name]);
-            							}
-            							options.xAxis.data = colArr;
-            							options.series[0].data = valArr;
-            							    $scope.dashboard.widgets.push({
+                                       for(let name in response.data.data){
+                                           if(options.series[0].type == 'line'){
+                                               colArr.push(response.data.data[name].agentName);
+                                               valArr.push(name);
+                                           } else{
+                                               colArr.push(name);
+                                               valArr.push(response.data.data[name]);
+                                           }
+
+                                       }
+                                        options.xAxis.data = colArr;
+                                        options.series[0].data = valArr;
+                                            $scope.dashboard.widgets.push({
                                                          col: 0,
                                                         row: 0,
                                                         sizeY: 3,
                                                         sizeX: 3,
-                                                        name: widgetName,
+                                                        name: widgetNameTest,
                                                         chart: {
                                                           options: options,
                                                           api: {}
                                                         }
 
-                                        			});
+                                                    });
 
-            						  }, function errorCallback(response) {
-            							console.log("error");
-            						  });
+                                      }, function errorCallback(response) {
+                                        console.log("error");
+                                      });
+
+                                }
+
 
             				}
             			  }, function errorCallback(response) {
@@ -234,6 +244,7 @@ $scope.renderWidget = function($index,widget){
 	      widget.domId = 'widget-container-'+$index;
 	      widget.id = $index;
 		  var myChart = echarts.init(document.getElementById(widget.domId));
+
 
         // specify chart configuration item and data
 
