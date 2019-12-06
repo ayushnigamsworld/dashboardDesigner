@@ -116,7 +116,21 @@ angular.module('app')
 
                            $http.post(response.data.data[i].api, newData).then(function (response) {
                            // This function handles success
-                                console.log(response);
+
+                                    options.xAxis.data = response.data.data.chartData[0];
+                                    options.series[0].data = response.data.data.chartData[1];
+
+                                    $scope.dashboards["1"].widgets.push({
+                                    col: i,
+                                    row: 0,
+                                    sizeY: 3,
+                                    sizeX: 3,
+                                    name: widgetName,
+                                    chart: {
+                                      options: options,
+                                      api: {}
+                                    }
+                                });
 
                            }, function (response) {
 
