@@ -208,7 +208,7 @@ angular.module('app')
             						var options = DataService[chart].options();
             						var colArr = new Array();
             						var valArr = new Array();
-            						if(widgetName == chart){
+            						if(widgetName == widgetNameTest){
             						    $http({
                                       method: 'GET',
                                       url: response.data.data[i].api
