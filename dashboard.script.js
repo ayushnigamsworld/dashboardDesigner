@@ -6,7 +6,7 @@ angular.module('app')
         $scope.widgetData =[];
         $scope.widgetJsonData = [];
         $scope.selectWidget = "";
-        var stop;
+        /*var stop;
 
           stop = $interval(function() {
                 $http({
@@ -44,7 +44,7 @@ angular.module('app')
 
            			  });
           }, 5000);
-
+*/
 		$scope.gridsterOptions = {
 			margins: [20, 20],
 			columns: 9,
@@ -98,43 +98,68 @@ angular.module('app')
 			  method: 'GET',
 			  url: 'https://dashboard.slate-platform.com/api/public/dashing/widgets'
 			}).then(function successCallback(response) {
-				for(var i=0; i<response.data.data.length; i++){
-					var options;
-					var widgetName = response.data.data[i].name;
-					var chart = response.data.data[i].chart;
+				for(let i=0; i<response.data.data.length; i++){
+					let options;
+					let widgetName = response.data.data[i].name;
+					let chart = response.data.data[i].chart;
 					$scope.widgetData.push(chart);
 					$scope.widgetJsonData.push(response.data.data[i]);
-						var options = DataService[chart].options();
-						var colArr = new Array();
-						var valArr = new Array();
-						$http({
-						  method: 'GET',
-						  url: response.data.data[i].api
-						}).then(function successCallback(response) {
-							console.log(response);
+						options = DataService[chart].options();
+						let colArr = new Array();
+						let valArr = new Array();
+						if(response.data.data[i].table_name != ""){
+						    let newData = {};
+						    newData["tableName"] = response.data.data[i].table_name;
+						    newData["aggFunction"] = response.data.data[i].aggfunction;
+						    newData["aggColumn"] = response.data.data[i].aggcolumn;
+						    newData["groupColumn"] = response.data.data[i].groupcolumn;
 
-							for(var name in response.data.data){
-								colArr.push(name);
-								valArr.push(response.data.data[name]);
-							}
-							options.xAxis.data = colArr;
-							options.series[0].data = valArr;
+                           $http.post(response.data.data[i].api, newData).then(function (response) {
+                           // This function handles success
+                                console.log(response);
 
-							$scope.dashboards["1"].widgets.push({
-                            col: i,
-                            row: 0,
-                            sizeY: 3,
-                            sizeX: 3,
-                            name: widgetName,
-                            chart: {
-                              options: options,
-                              api: {}
-                            }
-                        });
+                           }, function (response) {
 
-						  }, function errorCallback(response) {
-							console.log("error");
-						  });
+                           // this function handles error
+
+                           });
+						} else{
+								$http({
+                                  method: 'GET',
+                                  url: response.data.data[i].api
+                                }).then(function successCallback(response) {
+                                    console.log(response);
+
+                                    for(var name in response.data.data){
+                                        if(options.series[0].type == 'line'){
+                                            colArr.push(response.data.data[name].agentName);
+                                            valArr.push(name);
+                                        } else{
+                                            colArr.push(name);
+                                            valArr.push(response.data.data[name]);
+                                        }
+
+                                    }
+                                    options.xAxis.data = colArr;
+                                    options.series[0].data = valArr;
+
+                                    $scope.dashboards["1"].widgets.push({
+                                    col: i,
+                                    row: 0,
+                                    sizeY: 3,
+                                    sizeX: 3,
+                                    name: widgetName,
+                                    chart: {
+                                      options: options,
+                                      api: {}
+                                    }
+                                });
+
+                                  }, function errorCallback(response) {
+                                    console.log("error");
+                                  });
+						}
+
 
 				}
 				$scope.widgets = $scope.widgetData;
@@ -203,14 +228,9 @@ angular.module('app')
             			  });
 		};
 
-$scope.downloadWidget = function(){
-      //  $scope.widgetPayload =$scope.widgetJsonData;
-}
-
-
 $scope.renderWidget = function($index,widget){
 	  // wait for dom render
-	  setInterval(function(){
+	  setTimeout(function(){
 	      widget.domId = 'widget-container-'+$index;
 	      widget.id = $index;
 		  var myChart = echarts.init(document.getElementById(widget.domId));
@@ -219,16 +239,16 @@ $scope.renderWidget = function($index,widget){
 
         // use configuration item and data specified to show chart
 		try{
-		//	myChart.setOption($scope.widgetOptions);
-            if($scope.widgetOptions){
+			myChart.setOption(widget.chart.options);
+           /* if($scope.widgetOptions){
                 myChart.setOption($scope.widgetOptions);
             } else{
                     myChart.setOption(widget.chart.options);
-            }
+            }*/
 		}catch(ex){
 
 		}
-	  },6000);
+	  },200);
   }
 		$scope.$watch('selectedDashboardId', function(newVal, oldVal) {
 			if (newVal !== oldVal) {
