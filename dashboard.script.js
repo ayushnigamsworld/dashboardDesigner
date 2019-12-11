@@ -258,7 +258,7 @@ $scope.renderWidget = function($index,widget){
 	  setTimeout(function(){
 	      widget.domId = 'widget-container-'+$index;
 	      widget.id = $index;
-		  var myChart = echarts.init(document.getElementById(widget.domId));
+		  var myChart = echarts.init(document.getElementById(widget.domId), 'dark');
 
 
         // specify chart configuration item and data

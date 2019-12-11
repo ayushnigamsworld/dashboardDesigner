@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <title>Angular Gridster</title>
+    <title>Dashboard</title>
     <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width"/>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -20,6 +20,7 @@
 
     <script src="angular-gridster.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.3.0/echarts-en.min.js"></script>
+    <script src="theme/vintage.js"></script>
 
     <script type="text/javascript">
         (function() {
@@ -59,8 +60,7 @@
 <div ng-controller="RootCtrl">
     <link rel="stylesheet" ng-href="{{ styleUrl }}"/>
     <div>
-        <h1 class="text-center"><i class="fa fa-chart-line"></i> Dashboard</h1>
-        <hr/>
+        <h2 class="text-center"><i class="fa fa-chart-line"></i> Dashboard</h2>
 
     </div>
     <div ng-view></div>
