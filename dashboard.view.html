@@ -2,6 +2,10 @@
 	<div class="float-left">
 		<a class="pull-right btn btn-outline-danger" ng-click="clear()"><i class="fa fa-times"></i> Clear</a>
 	</div>
+	<input type="text" ng-model="widgetName" aria-label="greeting" />
+	<div class="float-left">
+		<a class="pull-right btn btn-outline-warning" ng-click="saveWidget()"><i class="fa fa-times"></i>save</a>
+	</div>
 	<div class="float-right">
 		<select class="form-control" style="width: 150px; padding-top: 0px; display:inline-block;"  ng-model="selectedWidget" ng-options="x for x in widgets" ng-change="widgetChange()" ng-selected="true" value="" selected="selected">
 		</select>

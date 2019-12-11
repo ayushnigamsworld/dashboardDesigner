@@ -190,6 +190,10 @@ angular.module('app')
 			$scope.dashboard.widgets = [];
 		};
 
+		$scope.showConsole = function() {
+			console.log("widgets arrray: " + JSON.stringify($scope.dashboard.widgets));
+		}
+
 		$scope.addWidget = function() {
 		 var widgetName = $scope.selectWidget;
 		// 	var options = DataService[widgetName].options();
@@ -252,6 +256,25 @@ angular.module('app')
 
             			  });
 		};
+
+        $scope.saveWidget = function() {
+            let dashboardData = {};
+            dashboardData["name"] = $scope.widgetName;
+            dashboardData["active"] = 'true';
+            dashboardData["widget"] = JSON.stringify($scope.dashboard.widgets);
+			debugger;
+            $http.post('https://dashboard.slate-platform.com/api/public/dashing/dashboard', dashboardData).then(function (response) {
+                // This function handles success
+				console.log('success Response: '+ JSON.stringify(response));
+
+            }, function (response) {
+
+                // this function handles error
+
+            }), function errorCallback(response) {
+
+            }
+        };
 
 $scope.renderWidget = function($index,widget){
 	  // wait for dom render
