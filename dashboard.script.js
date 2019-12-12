@@ -257,7 +257,7 @@ angular.module('app')
             			  });
 		};
 
-        $scope.saveWidget = function() {
+        $scope.saveDashboard = function() {
             let dashboardData = {};
             dashboardData["name"] = $scope.widgetName;
             dashboardData["active"] = 'true';
