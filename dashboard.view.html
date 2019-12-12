@@ -4,7 +4,10 @@
 	</div>
 	<input type="text" ng-model="widgetName" aria-label="greeting" />
 	<div class="float-left">
-		<a class="pull-right btn btn-outline-warning" ng-click="saveDashboard()"><i class="fa fa-times"></i>save</a>
+		<a class="pull-right btn btn-outline-primary" ng-click="saveDashboard()"><i class="fa fa-times"></i>save</a>
+	</div>
+	<div class="float-left">
+		<a class="pull-right btn btn-outline-warning" ng-click="refreshDashboard()"><i class="fa fa-times"></i>Refresh</a>
 	</div>
 	<div class="float-right">
 		<select class="form-control" style="width: 150px; padding-top: 0px; display:inline-block;"  ng-model="selectedWidget" ng-options="x for x in widgets" ng-change="widgetChange()" ng-selected="true" value="" selected="selected">
@@ -17,7 +20,7 @@
 </div>
 <div gridster="gridsterOptions"  class="">
 	<ul>
-		<li gridster-item="widget" ng-repeat="widget in dashboard.widgets">
+		<li gridster-item="widget" ng-repeat="widget in dashboard.widget">
 			<div class="box" ng-controller="CustomWidgetCtrl">
 				<div class="box-header">
 					<h5 class="text-right">{{ widget.name }}</h5>
