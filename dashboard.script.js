@@ -1,7 +1,50 @@
 angular.module('app')
 
-.controller('DashboardCtrl', ['$scope', '$timeout', 'DataService', '$http',
-	function($scope, $timeout,DataService, $http) {
+.controller('DashboardCtrl', ['$scope', '$timeout', 'DataService', '$http', '$interval',
+	function($scope, $timeout,DataService, $http, $interval) {
+	    $scope.widgetOptions =[];
+        $scope.widgetData =[];
+        $scope.widgetJsonData = [];
+        $scope.selectWidget = "";
+        /*var stop;
+
+          stop = $interval(function() {
+                $http({
+           			  method: 'GET',
+           			  url: 'https://dashboard.slate-platform.com/api/public/dashing/widgets'
+           			}).then(function successCallback(response) {
+           				console.log(response);
+           				for(var i=0; i<response.data.data.length; i++){
+           					var options;
+           					var widgetName = response.data.data[i].name;
+           					var chart = response.data.data[i].chart;
+           						var options = DataService[chart].options();
+           						var colArr = new Array();
+           						var valArr = new Array();
+           						$http({
+           						  method: 'GET',
+           						  url: response.data.data[i].api
+           						}).then(function successCallback(response) {
+           							console.log(response);
+
+           							for(var name in response.data.data){
+           								colArr.push(name);
+           								valArr.push(response.data.data[name]);
+           							}
+           							options.xAxis.data = colArr;
+           							options.series[0].data = valArr;
+                              $scope.widgetOptions = options;
+
+           						  }, function errorCallback(response) {
+           							console.log("error");
+           						  });
+
+           				}
+           			  }, function errorCallback(response) {
+
+           			  });
+          }, 5000);
+*/
 		$scope.gridsterOptions = {
 			margins: [20, 20],
 			columns: 9,
@@ -25,93 +68,243 @@ angular.module('app')
             },
 		};
 
-		$scope.dashboards = {
-			'1': {
-				id: '1',
-				name: 'Home',
-				widgets: []
-			},
-			'2': {
-				id: '2',
-				name: 'Other',
-				widgets: [{
-					col: 1,
-					row: 1,
-					sizeY: 1,
-					sizeX: 2,
-					name: "Other Widget 1"
-				}, {
-					col: 1,
-					row: 3,
-					sizeY: 1,
-					sizeX: 1,
-					name: "Other Widget 2"
-				}]
-			}
-		};
+        $scope.dashboards = [];
 
-		
 		$http({
 			  method: 'GET',
 			  url: 'https://dashboard.slate-platform.com/api/public/dashing/widgets'
 			}).then(function successCallback(response) {
-				console.log(response);
-				for(var i=0; i<response.data.data.length; i++){
-					var options;
-					var widgetName = response.data.data[i].name;
-					var chart = response.data.data[i].chart;
-						var options = DataService[chart].options();
-						var colArr = new Array();
-						var valArr = new Array();
-						$http({
-						  method: 'GET',
-						  url: response.data.data[i].api
-						}).then(function successCallback(response) {
-							console.log(response);
-							
-							for(var name in response.data.data){
-								colArr.push(name);
-								valArr.push(response.data.data[name]);
-							}
-							options.xAxis.data = colArr;
-							options.series[0].data = valArr;
-							
-							$scope.dashboards["1"].widgets.push({
-                            col: i,
-                            row: 0,
-                            sizeY: 3,
-                            sizeX: 3,
-                            name: widgetName,
-                            chart: {
-                              options: options,
-                              api: {}
-                            }
-                        });
-						  }, function errorCallback(response) {
-							console.log("error");
-						  });
-					
-				}
-			  }, function errorCallback(response) {
-				
-			  });
-			  
-			  
-		
+				for(let i=0; i<response.data.data.length; i++){
+					let options;
+					let widgetName = response.data.data[i].name;
+					let chart = response.data.data[i].chart;
 
-		
-		
+					$scope.widgetJsonData.push(response.data.data[i]);
+						options = DataService[chart].options();
+						let colArr = new Array();
+						let valArr = new Array();
+					    $scope.widgetData.push(widgetName);
+						if(response.data.data[i].table_name != ""){
+						    let newData = {};
+						    newData["tableName"] = response.data.data[i].table_name;
+						    newData["aggFunction"] = response.data.data[i].aggfunction;
+						    newData["aggColumn"] = response.data.data[i].aggcolumn;
+						    newData["groupColumn"] = response.data.data[i].groupcolumn;
+
+                           $http.post(response.data.data[i].api, newData).then(function (response) {
+                           // This function handles success
+
+                                    options.xAxis.data = response.data.data.chartData[0];
+                                    options.series[0].data = response.data.data.chartData[1];
+
+                               $scope.dashboards[i].widget.push({
+                                    col: i,
+                                    row: 0,
+                                    sizeY: 3,
+                                    sizeX: 3,
+                                    name: widgetName,
+                                    chart: {
+                                      options: options,
+                                      api: {}
+                                    }
+                                });
+
+                           }, function (response) {
+
+                           // this function handles error
+
+                           });
+						} else{
+								$http({
+                                  method: 'GET',
+                                  url: response.data.data[i].api
+                                }).then(function successCallback(response) {
+                                    console.log(response);
+
+                                    for(var name in response.data.data){
+                                        if(options.series[0].type == 'line'){
+                                            colArr.push(response.data.data[name].agentName);
+                                            valArr.push(name);
+                                        } else{
+                                            colArr.push(name);
+                                            valArr.push(response.data.data[name]);
+                                        }
+
+                                    }
+                                    options.xAxis.data = colArr;
+                                    options.series[0].data = valArr;
+
+                                    $scope.dashboards[i].widget.push({
+                                    col: i,
+                                    row: 0,
+                                    sizeY: 3,
+                                    sizeX: 3,
+                                    name: widgetName,
+                                    chart: {
+                                      options: options,
+                                      api: {}
+                                    }
+                                });
+                                  }, function errorCallback(response) {
+                                    console.log("error");
+                                  });
+						}
+
+
+				}
+				$scope.widgets = $scope.widgetData;
+
+			  }, function errorCallback(response) {
+
+			  });
+ $scope.widgetChange = function() {
+      $scope.selectWidget =  $scope.selectedWidget;
+
+        };
 		$scope.clear = function() {
 			$scope.dashboard.widgets = [];
 		};
 
+		$scope.showConsole = function() {
+			console.log("widgets arrray: " + JSON.stringify($scope.dashboard.widgets));
+		}
+
 		$scope.addWidget = function() {
-			$scope.dashboard.widgets.push({
-				name: "New Widget",
-				sizeX: 1,
-				sizeY: 1
-			});
+		 var widgetName = $scope.selectWidget;
+		// 	var options = DataService[widgetName].options();
+            var colArr = new Array();
+			var valArr = new Array();
+
+			$http({
+            			  method: 'GET',
+            			  url: 'https://dashboard.slate-platform.com/api/public/dashing/widgets'
+            			}).then(function successCallback(response) {
+            				console.log(response);
+            				for(var i=0; i<response.data.data.length; i++){
+            					var options;
+            					var widgetNameTest = response.data.data[i].name;
+            					var chart = response.data.data[i].chart;
+            						var options = DataService[chart].options();
+            						var colArr = new Array();
+            						var valArr = new Array();
+            						if(widgetName == widgetNameTest){
+            						    $http({
+                                      method: 'GET',
+                                      url: response.data.data[i].api
+                                    }).then(function successCallback(response) {
+                                        console.log(response);
+
+                                       for(let name in response.data.data){
+                                           if(options.series[0].type == 'line'){
+                                               colArr.push(response.data.data[name].agentName);
+                                               valArr.push(name);
+                                           } else{
+                                               colArr.push(name);
+                                               valArr.push(response.data.data[name]);
+                                           }
+
+                                       }
+                                        options.xAxis.data = colArr;
+                                        options.series[0].data = valArr;
+                                            $scope.dashboards[i].widget.push({
+                                                         col: 0,
+                                                        row: 0,
+                                                        sizeY: 3,
+                                                        sizeX: 3,
+                                                        name: widgetNameTest,
+                                                        chart: {
+                                                          options: options,
+                                                          api: {}
+                                                        }
+
+                                                    });
+                                      }, function errorCallback(response) {
+                                        console.log("error");
+                                      });
+
+                                }
+
+
+            				}
+            			  }, function errorCallback(response) {
+
+            			  });
 		};
+
+        $scope.saveDashboard = function() {
+            let dashboardData = {};
+            dashboardData["name"] = $scope.widgetName;
+            dashboardData["active"] = 'true';
+            dashboardData["widget"] = JSON.stringify($scope.dashboard.widgets);
+            $http.post('https://dashboard.slate-platform.com/api/public/dashing/dashboard', dashboardData).then(function (response) {
+                // This function handles success
+				console.log('success Response: '+ JSON.stringify(response));
+
+            }, function (response) {
+
+                // this function handles error
+
+            }), function errorCallback(response) {
+
+            }
+        };
+
+        $scope.refreshDashboard = function() {
+            $http({
+                method: 'GET',
+                url: 'https://dashboard.slate-platform.com/api/public/dashing/dashboards'
+            }).then(function successCallback(response) {
+                console.log(response);
+                for(var i=0; i<response.data.data.length; i++){
+                    var options;
+                    $scope.dashboards.push(response.data.data[i]);
+                    // var options = DataService[chart].options();
+                    // var colArr = new Array();
+                    // var valArr = new Array();
+                    /*if(widgetName == widgetNameTest){
+                        $http({
+                            method: 'GET',
+                            url: response.data.data[i].api
+                        }).then(function successCallback(response) {
+                            console.log(response);
+
+                            for(let name in response.data.data){
+                                if(options.series[0].type == 'line'){
+                                    colArr.push(response.data.data[name].agentName);
+                                    valArr.push(name);
+                                } else{
+                                    colArr.push(name);
+                                    valArr.push(response.data.data[name]);
+                                }
+
+                            }
+                            options.xAxis.data = colArr;
+                            options.series[0].data = valArr;
+                            $scope.dashboard.widgets.push({
+                                col: 0,
+                                row: 0,
+                                sizeY: 3,
+                                sizeX: 3,
+                                name: widgetNameTest,
+                                chart: {
+                                    options: options,
+                                    api: {}
+                                }
+
+                            });
+
+                        }, function errorCallback(response) {
+                            console.log("error");
+                        });
+
+                    }*/
+
+
+                }
+            }, function errorCallback(response) {
+
+            });
+        };
 
 $scope.renderWidget = function($index,widget){
 	  // wait for dom render
@@ -120,11 +313,17 @@ $scope.renderWidget = function($index,widget){
 	      widget.id = $index;
 		  var myChart = echarts.init(document.getElementById(widget.domId));
 
+
         // specify chart configuration item and data
 
         // use configuration item and data specified to show chart
 		try{
 			myChart.setOption(widget.chart.options);
+           /* if($scope.widgetOptions){
+                myChart.setOption($scope.widgetOptions);
+            } else{
+                    myChart.setOption(widget.chart.options);
+            }*/
 		}catch(ex){
 
 		}
@@ -132,7 +331,13 @@ $scope.renderWidget = function($index,widget){
   }
 		$scope.$watch('selectedDashboardId', function(newVal, oldVal) {
 			if (newVal !== oldVal) {
-				$scope.dashboard = $scope.dashboards[newVal];
+				// $scope.dashboard = $scope.dashboards[newVal];
+				 $scope.dashboards.forEach(function (value) {
+					if(value.id === newVal){
+					//return value;
+                        $scope.dashboard = value;
+					}});
+
 			} else {
 				$scope.dashboard = $scope.dashboards[1];
 			}

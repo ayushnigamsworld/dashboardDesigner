@@ -1,17 +1,23 @@
 angular.module('app')
 .factory('DataService', function() {
   return {
-    doughnutChart: {
-      options: doughnutChartOptions
-    },
     bar: {
-      options: discreteBarChartOptions
+      options: barChartOptions
     },
-    pie: {
-      options: pieChartOptions
+    funnel: {
+      options: funnelChartOptions
     },
-    barRotated: {
-      options: scatterChartOptions
+    area:{
+        options: areaChartOptions
+    },
+    pie:{
+        options: pieChartOptions
+    },
+    barRotated:{
+        options: barChartRotatedOptions
+    },
+    line:{
+        options: lineChartOptions
     }
   };
 
@@ -19,147 +25,208 @@ angular.module('app')
 	/**
 	 *  Data & Options Generators
 	 */
-	function doughnutChartOptions() {
+	function barChartOptions() {
+	  return   {
+                  xAxis: {
+                      type: 'category',
+                      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  },
+                  yAxis: {
+                      type: 'value'
+                  },
+                  series: [{
+                      data: [120, 200, 150, 80, 70, 110, 130],
+                      type: 'bar'
+                  }]
+              };
+	}
+
+	function funnelChartOptions() {
 	  return {
+                 title: {
+                     text: '???',
+                     subtext: '????'
+                 },
                  tooltip: {
                      trigger: 'item',
-                     formatter: "{a} <br/>{b}: {c} ({d}%)"
+                     formatter: "{a} <br/>{b} : {c}%"
+                 },
+                 toolbox: {
+                     feature: {
+                         dataView: {readOnly: false},
+                         restore: {},
+                         saveAsImage: {}
+                     }
                  },
                  legend: {
-                     orient: 'vertical',
-                     x: 'left',
-                     data:['Available','Away','Busy','Active']
+                     data: ['??','??','??','??','??']
                  },
+                 calculable: true,
                  series: [
                      {
-                         name:'DoughnutChart',
-                         type:'pie',
-                         radius: ['50%', '70%'],
-                         avoidLabelOverlap: false,
+                         name:'???',
+                         type:'funnel',
+                         left: '10%',
+                         top: 60,
+                         //x2: 80,
+                         bottom: 60,
+                         width: '80%',
+                         // height: {totalHeight} - y - y2,
+                         min: 0,
+                         max: 100,
+                         minSize: '0%',
+                         maxSize: '100%',
+                         sort: 'descending',
+                         gap: 2,
                          label: {
-                             normal: {
-                                 show: false,
-                                 position: 'center'
-                             },
-                             emphasis: {
-                                 show: true,
-                                 textStyle: {
-                                     fontSize: '30',
-                                     fontWeight: 'bold'
-                                 }
-                             }
+                             show: true,
+                             position: 'inside'
                          },
                          labelLine: {
-                             normal: {
-                                 show: false
+                             length: 10,
+                             lineStyle: {
+                                 width: 1,
+                                 type: 'solid'
                              }
                          },
-                         data:[
-                             {value:5, name:'Available'},
-                             {value:3, name:'Away'},
-                             {value:2, name:'Busy'},
-                             {value:1, name:'Active'}
+                         itemStyle: {
+                             borderColor: '#fff',
+                             borderWidth: 1
+                         },
+                         emphasis: {
+                             label: {
+                                 fontSize: 20
+                             }
+                         },
+                         data: [
+                             {value: 60, name: '??'},
+                             {value: 40, name: '??'},
+                             {value: 20, name: '??'},
+                             {value: 80, name: '??'},
+                             {value: 100, name: '??'}
                          ]
                      }
                  ]
              };
-
 	}
 
-	function discreteBarChartOptions() {
-	  return {
-            tooltip: {},
-            legend: {
-                data:[]
-            },
-            xAxis: {
-                data: []
-            },
-            yAxis: {},
-            series: [{
-                type: 'bar',
-                data: []
-            }]
-        };
-	}
+	function areaChartOptions() {
+    	  return  {
+                  xAxis: {
+                      type: 'category',
+                      boundaryGap: false,
+                      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  },
+                  yAxis: {
+                      type: 'value'
+                  },
+                  series: [{
+                      data: [820, 932, 901, 934, 1290, 1330, 1320],
+                      type: 'line',
+                      areaStyle: {}
+                  }]
+              };
+    	}
 
-  function pieChartOptions() {
-    return {
-    backgroundColor: '#2c343c',
-    tooltip : {
-        trigger: 'item',
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    series : [
-        {
-            name:'Pie Chart',
-            type:'pie',
-            radius : '55%',
-            center: ['50%', '50%'],
-            data:[
-                {value:35, name:'Handled Calls'},
-                {value:40, name:'Inbound Calls'},
-                {value:4, name:'Outbound Calls'},
-                {value:44, name:'Total Calls'}
-            ].sort(function (a, b) { return a.value - b.value; }),
-            roseType: 'radius',
-            label: {
-                normal: {
-                    textStyle: {
-                        color: 'rgba(255, 255, 255, 0.3)'
-                    }
-                }
-            },
-            labelLine: {
-                normal: {
-                    lineStyle: {
-                        color: 'rgba(255, 255, 255, 0.3)'
-                    },
-                    smooth: 0.2,
-                    length: 10,
-                    length2: 20
-                }
-            },
-            itemStyle: {
-                normal: {
-                    color: '#c23531',
-                    shadowBlur: 200,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            },
+    	function pieChartOptions() {
+          return  {
+                               title: {
+                                   text: 'Agent Status',
+                                   subtext: 'Status Over Time',
+                                   x: 'center'
+                               },
+                               tooltip: {
+                                   trigger: 'item',
+                                   formatter: "{a} <br/>{b} : {c} ({d}%)"
+                               },
+                               legend: {
+                                   orient: 'vertical',
+                                   left: 'left',
+                                   data: ['Available', 'Active', 'Busy', 'Away', 'Offline']
+                               },
+                               series: [
+                                   {
+                                       name: 'Agent Status',
+                                       type: 'pie',
+                                       radius: '55%',
+                                       center: ['50%', '60%'],
+                                       data: [
+                                           {value: 335, name: 'Available'},
+                                           {value: 310, name: 'Active'},
+                                           {value: 234, name: 'Busy'},
+                                           {value: 135, name: 'Away'},
+                                           {value: 1548, name: 'Offline'}
+                                       ],
+                                       itemStyle: {
+                                           emphasis: {
+                                               shadowBlur: 10,
+                                               shadowOffsetX: 0,
+                                               shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                           }
+                                       }
+                                   }
+                               ]
+                           };
+                 }
 
-            animationType: 'scale',
-            animationEasing: 'elasticOut',
-            animationDelay: function (idx) {
-                return Math.random() * 200;
+     function barChartRotatedOptions() {
+              return  {
+                          dataset: {
+                              source: [
+                                  ['score', 'amount', 'product'],
+                                  [89.3, 58212, 'Matcha Latte'],
+                                  [57.1, 78254, 'Milk Tea'],
+                                  [74.4, 41032, 'Cheese Cocoa'],
+                                  [50.1, 12755, 'Cheese Brownie'],
+                                  [89.7, 20145, 'Matcha Cocoa'],
+                                  [68.1, 79146, 'Tea'],
+                                  [19.6, 91852, 'Orange Juice'],
+                                  [10.6, 101852, 'Lemon Juice'],
+                                  [32.7, 20112, 'Walnut Brownie']
+                              ]
+                          },
+                          grid: {containLabel: true},
+                          xAxis: {name: 'amount'},
+                          yAxis: {type: 'category'},
+                          visualMap: {
+                              orient: 'horizontal',
+                              left: 'center',
+                              min: 10,
+                              max: 100,
+                              text: ['High Score', 'Low Score'],
+                              // Map the score column to color
+                              dimension: 0,
+                              inRange: {
+                                  color: ['#D7DA8B', '#E15457']
+                              }
+                          },
+                          series: [
+                              {
+                                  type: 'bar',
+                                  encode: {
+                                      // Map the "amount" column to X axis.
+                                      x: 'amount',
+                                      // Map the "product" column to Y axis
+                                      y: 'product'
+                                  }
+                              }
+                          ]
+                      };
             }
-        }
-    ]
-};
-  }
 
-  function scatterChartOptions() {
-    return {
-              xAxis: {},
-              yAxis: {},
-              series: [{
-                  symbolSize: 20,
-                  data: [
-                      [10.0, 8.04],
-                      [8.0, 6.95],
-                      [13.0, 7.58],
-                      [9.0, 8.81],
-                      [11.0, 8.33],
-                      [14.0, 9.96],
-                      [6.0, 7.24],
-                      [4.0, 4.26],
-                      [12.0, 10.84],
-                      [7.0, 4.82],
-                      [5.0, 5.68]
-                  ],
-                  type: 'scatter'
-              }]
-          };
-  }
-
+            function lineChartOptions() {
+              return  {
+                          xAxis: {
+                              type: 'category',
+                              data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                          },
+                          yAxis: {
+                              type: 'value'
+                          },
+                          series: [{
+                              data: [820, 932, 901, 934, 1290, 1330, 1320],
+                              type: 'line'
+                          }]
+                      };
+              }
 });
